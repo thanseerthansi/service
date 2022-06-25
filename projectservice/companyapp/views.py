@@ -302,20 +302,25 @@ class AcceptedQuoteView(ListAPIView):
     permission_classes =(IsAuthenticated,)
     def post(self,request):
         userid = self.request.user.id
+        is_admin = self.request.user.is_admin
         id = self.request.POST.get("id",'')
         # partnerservice = self.request.POST.get("partnerservice",'')
         quote = self.request.POST.get("quote")
-        try:
-            partnerservice_qs = PartnerServiceModel.objects.filter(partnerid__id=userid)
-            
-            if partnerservice_qs.count():
-                partnerservice_obj = partnerservice_qs.first()           
-            else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"User not found "})
+        try:  
             if quote:
                 quote_qs = QuoteModel.objects.filter(id=quote)
                 if quote_qs.count():
                     quote_obj = quote_qs.first()
                 else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"quote not found"})
+            if  is_admin ==True:
+                partnerservice = self.request.POST.get('partnerservice','')
+                if partnerservice:
+                    partnerservice_qs = PartnerServiceModel.objects.filter(id=partnerservice)
+            else:
+                partnerservice_qs = PartnerServiceModel.objects.filter(partnerid__id=userid)
+            if partnerservice_qs.count():
+                partnerservice_obj = partnerservice_qs.first()           
+            else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"User not found "})
             if id:
                 if id.isdigit():
                     accepted_qs = AcceptedQuoteModel.objects.filter(id=id)  

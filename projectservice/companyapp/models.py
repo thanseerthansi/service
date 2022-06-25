@@ -41,8 +41,13 @@ class AcceptedQuoteModel(models.Model): #added while partner accept the quote re
     partnerid = models.ForeignKey(PartnerServiceModel,on_delete=models.CASCADE,null=True)
     quote = models.ForeignKey(QuoteModel,on_delete=models.CASCADE,null=True)
     status = models.CharField(max_length=100)
+    is_booking = models.BooleanField(default=False)
     created_date =  models.DateTimeField(auto_now_add=True,null=True)
     updated_date = models.DateTimeField(auto_now=True,null=True)
 
-class BookingAcceptModel(models.Model):
-    pass
+# class BookingAcceptModel(models.Model):
+#     partnerid = models.ForeignKey(PartnerServiceModel,on_delete=models.CASCADE,null=True)
+#     quote = models.ForeignKey(QuoteModel,on_delete=models.CASCADE,null=True)
+#     status = models.CharField(max_length=100)
+#     created_date =  models.DateTimeField(auto_now_add=True,null=True)
+#     updated_date = models.DateTimeField(auto_now=True,null=True)

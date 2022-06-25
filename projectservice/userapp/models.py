@@ -2,6 +2,8 @@
 from tokenize import Triple
 from django.contrib.gis.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import datetime
+from uuid import uuid4
 
 from serviceapp.models import ServiceModel
 # Create your models here.
@@ -22,6 +24,7 @@ class LocationModel(models.Model):
 class QuoteModel(models.Model):
     userid = models.ForeignKey(UserModel,on_delete=models.CASCADE,null=True,blank=True)
     service = models.ForeignKey(ServiceModel,on_delete=models.SET_NULL,null=True)
+    unique_code = models.CharField(max_length=100, default=datetime.now().strftime('%Y%m%d%H') + str(uuid4()),editable = False)
     service_date = models.DateField()
     service_time = models.TimeField(null=True)#for booking
     service_location = models.CharField(max_length=100)
@@ -35,14 +38,3 @@ class QuoteModel(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
 
 
-# class BookingModel(models.Model):
-#     userid = models.ForeignKey(UserModel,on_delete=models.CASCADE)
-#     service = models.ForeignKey(ServiceModel,on_delete=models.SET_NULL,null=True)
-#     service_date = models.DateField()
-#     service_location = models.CharField(max_length=100)
-#     living_type = models.CharField(max_length=100)
-#     description = models.TextField(null=True)
-#     status = models.CharField(max_length=100)
-#     payment = models.CharField(max_length=100)
-#     created_date =  models.DateTimeField(auto_now_add=True)
-#     updated_date = models.DateTimeField(auto_now=True)

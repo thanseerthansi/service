@@ -5,6 +5,7 @@ from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import GeometryDistance
 from django.contrib.gis.geos import GEOSGeometry
 
+
 # Create your views here.
 class UserView(ListAPIView):
     serializer_class = UserSerializer
@@ -239,7 +240,6 @@ class QuoteView(ListAPIView):
                     else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No Records found with given id"})
                 else: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Provide valid id"}) 
             else: 
-                
                 quote_obj = QuoteSerializer(data=self.request.data,partial=True)
                 # print("dara",self.request.data)
                 msg = "Successfully Created"  
