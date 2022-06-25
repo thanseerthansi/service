@@ -1,3 +1,4 @@
 /smenv
 /projectservice/.vscode
 /.vscode
+desktop.ini
