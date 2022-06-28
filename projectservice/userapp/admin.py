@@ -5,3 +5,6 @@ from userapp.models import *
 admin.site.register(UserModel)
 admin.site.register(LocationModel)
 admin.site.register(QuoteModel)
+admin.site.register(WalletModel)
+admin.site.register(CardModel)
+

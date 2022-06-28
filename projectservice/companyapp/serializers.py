@@ -83,3 +83,15 @@ class AcceptedQuoteSerializer(serializers.ModelSerializer):
         v_qs = QuoteSerializer(v_obj, many=True)
         
         return v_qs.data
+
+class PaymentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    class Meta:
+        model = PaymentModel
+        fields = '__all__'
+    def get_user(self,obj):
+        
+        v_obj = UserModel.objects.filter(id=obj.paymentfrom.id)
+        v_qs = UserSerializer(v_obj, many=True)
+        
+        return v_qs.data

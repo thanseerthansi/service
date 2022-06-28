@@ -314,3 +314,135 @@ class QuoteView(ListAPIView):
                 "Status" : status.HTTP_400_BAD_REQUEST,
                 "Message" : str(e),
             })
+
+class WalletView(ListAPIView):
+    serializer_class = WalletSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes =(IsAuthenticated,)
+    def post(self,request):
+        try:
+            # mandatory = ['balance']
+            # data = Validate(self.request.data,mandatory)
+            id = self.request.POST.get("id","")   
+            userid = self.request.user.id        
+            if userid != None:
+                user_qs = UserModel.objects.filter(id=userid)
+                if user_qs.count(): user_obj = user_qs.first()  
+            else :return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"User not found please login"})   
+            if id: 
+                if id.isdigit():
+                    wallet_qs = WalletModel.objects.filter(id=id)
+                    if wallet_qs.count():
+                        wallet_qs = wallet_qs.first()
+                        wallet_obj = WalletModel(wallet_qs,data=self.request.data,partial=True)
+                        msg = "Successfully modified"
+                        
+                    else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No Records found with given id"})
+                else: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Provide valid id"}) 
+            else: 
+                # if data == True:
+                wallet_obj = WalletSerializer(data=self.request.data,partial=True)
+                msg = "Successfully Created" 
+                # else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":data}) 
+            wallet_obj.is_valid(raise_exception=True)
+            wallet_obj.save(user=user_obj )
+            return Response({"Status":status.HTTP_200_OK,"Message":msg})                
+        except Exception as e: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":str(e),})
+    def get_queryset(self):
+        try:
+            id = self.request.GET.get("id",'')
+            user = self.request.GET.get("user",'')#to get the user data only
+            userid = self.request.user.id
+            getuser = self.request.GET.get("userid")
+            qs = WalletModel.objects.all().select_related('user')
+            if getuser: qs = qs.filter(user__id=getuser)
+            if id : qs = qs.filter(id=id)
+            if user : qs = qs.filter(user__id=userid)
+            return qs
+        except :return None
+ 
+    def delete(self,request):
+        try:
+            id = self.request.data['id']
+            # id = json.loads(id)
+            objects = WalletModel.objects.filter(id=id)
+            if objects.count():
+                objects.delete()
+                return Response({"Status":status.HTTP_200_OK,"Message":"deleted successfully"})
+            else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No records with given id"})
+        except Exception as e:
+            return Response({
+                "Status" : status.HTTP_400_BAD_REQUEST,
+                "Message" : str(e),
+            })
+
+
+class CardView(ListAPIView):
+    serializer_class = CardSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes =(IsAuthenticated,)
+    def post(self,request):
+        try:
+            mandatory = ['card_no','name_of_card','valid_thru','cvv']
+            data = Validate(self.request.data,mandatory)
+            id = self.request.POST.get("id","")   
+            userid = self.request.user.id        
+            if userid != None:
+                user_qs = UserModel.objects.filter(id=userid)
+                if user_qs.count(): user_obj = user_qs.first()  
+            else :return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"User not found please login"})   
+            # if id: 
+            #     if id.isdigit():
+            #         wallet_qs = WalletModel.objects.filter(id=id)
+            #         if wallet_qs.count():
+            #             wallet_qs = wallet_qs.first()
+            #             wallet_obj = WalletModel(wallet_qs,data=self.request.data,partial=True)
+            #             msg = "Successfully modified"
+                        
+            #         else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No Records found with given id"})
+            #     else: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Provide valid id"}) 
+            # else: 
+            # if data == True:
+            card_list = list(CardModel.objects.filter(user=userid).values_list('user',flat=True))
+            # print("card",card_list)
+            # print("carduser",user_obj.id)
+            if user_obj.id in card_list: 
+                card_qs= CardModel.objects.filter(user=userid)
+                if card_qs.count():
+                    card_qs = card_qs.first()
+                    card_obj = CardSerializer(card_qs,data=self.request.data,partial=True)
+                    msg = "updated successfully"
+                else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"card not found"})
+            else:
+                card_obj = CardSerializer(data=self.request.data,partial=True)
+                msg = "Successfully Created" 
+            # else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":data}) 
+            card_obj.is_valid(raise_exception=True)
+            card_obj.save(user=user_obj)
+            return Response({"Status":status.HTTP_200_OK,"Message":msg})                
+        except Exception as e: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":str(e),})
+    def get_queryset(self):
+        try:
+            id = self.request.GET.get("id",'')
+            # user = self.request.GET.get("user",'')#to get the user data only
+            userid = self.request.user.id
+            qs = CardModel.objects.filter(user__id=userid).select_related('user')
+            if id : qs = qs.filter(id=id)
+            # if user : qs = qs.filter(user__id=userid)
+            return qs
+        except :return None
+ 
+    def delete(self,request):
+        try:
+            id = self.request.data['id']
+            # id = json.loads(id)
+            objects = CardModel.objects.filter(id=id)
+            if objects.count():
+                objects.delete()
+                return Response({"Status":status.HTTP_200_OK,"Message":"deleted successfully"})
+            else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No records with given id"})
+        except Exception as e:
+            return Response({
+                "Status" : status.HTTP_400_BAD_REQUEST,
+                "Message" : str(e),
+            })

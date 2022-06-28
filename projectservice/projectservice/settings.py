@@ -145,3 +145,6 @@ AUTH_USER_MODEL = 'userapp.UserModel'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+RAZOR_KEY_ID = 'rzp_test_mSeuLnKB76I9N8'   
+RAZOR_KEY_SECRET = 'bb2K8X1SMPpvS1keCbRKTz8I'

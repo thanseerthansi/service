@@ -42,3 +42,29 @@ class QuoteSerializer(serializers.ModelSerializer):
             v_qs = ServiceSerializer(v_obj, many=True)
             
             return v_qs.data
+
+
+class WalletSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    class Meta:
+        model = WalletModel
+        fields = '__all__'
+    def get_user(self,obj):
+        
+        v_obj = UserModel.objects.filter(id=obj.user.id)
+        v_qs = UserSerializer(v_obj, many=True)
+        
+        return v_qs.data
+
+class CardSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    class Meta:
+        model = CardModel
+        fields = '__all__'
+    def get_user(self,obj):
+        
+        v_obj = UserModel.objects.filter(id=obj.user.id)
+        v_qs = UserSerializer(v_obj, many=True)
+        
+        return v_qs.data
+

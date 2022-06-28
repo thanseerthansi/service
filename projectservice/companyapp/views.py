@@ -1,4 +1,8 @@
 from projectservice.globalimport import *
+import razorpay
+from django.conf import settings
+
+from projectservice.settings import RAZOR_KEY_ID, RAZOR_KEY_SECRET
 
 
 # Create your views here.
@@ -369,3 +373,58 @@ class AcceptedQuoteView(ListAPIView):
             return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No record found"})
         except Exception as e:
             return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":str(e)})
+
+
+
+class PaymentView(ListAPIView):
+    serializer_class = PaymentSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes =(IsAuthenticated,)
+    client = razorpay.Client(auth=(RAZOR_KEY_ID, RAZOR_KEY_SECRET))
+    def post(self,request):
+        try:
+            mandatory = ['paymentid']
+            data = Validate(self.request.data,mandatory)
+            id = self.request.POST.get("id","")   
+            userid = self.request.user.id  
+            acceptedquote = self.request.POST.get('accepted_quote','')      
+            if acceptedquote:
+                booked_qs = AcceptedQuoteModel.objects.filter(id=acceptedquote,is_booking=True)
+                if booked_qs.count(): booked_obj = booked_qs.first()  
+            else :return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"Booked quote not found please login"})   
+            if data == True:
+                payment_obj = PaymentSerializer(data=self.request.data,partial=True)
+                msg = "Successfully Created" 
+            # else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":data}) 
+            payment_obj.is_valid(raise_exception=True)
+            payment_obj.save(quote=booked_obj)
+            return Response({"Status":status.HTTP_200_OK,"Message":msg})                
+        except Exception as e: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":str(e),})
+    def get_queryset(self):
+        try:
+            id = self.request.GET.get("id",'')
+            # user = self.request.GET.get("user",'')#to get the user data only
+            userid = self.request.user.id
+            user = self.request.GET.get('user','')
+            getuser = self.request.GET.get('userid','')
+            qs = PaymentModel.objects.all().select_related('user')
+            if getuser: qs = qs.filter(user__id=getuser)
+            if id : qs = qs.filter(id=id)
+            if user : qs = qs.filter(user__id=userid)
+            return qs
+        except :return None
+ 
+    def delete(self,request):
+        try:
+            id = self.request.data['id']
+            # id = json.loads(id)
+            objects = PaymentModel.objects.filter(id=id)
+            if objects.count():
+                objects.delete()
+                return Response({"Status":status.HTTP_200_OK,"Message":"deleted successfully"})
+            else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No records with given id"})
+        except Exception as e:
+            return Response({
+                "Status" : status.HTTP_400_BAD_REQUEST,
+                "Message" : str(e),
+            })

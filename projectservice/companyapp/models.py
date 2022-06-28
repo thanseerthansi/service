@@ -1,8 +1,8 @@
 
 from django.db import models
-from serviceapp.models import *
-from serviceapp.serializers import *
-from userapp.models import *
+from serviceapp.models import ServiceModel,ServiceCitiesModel  
+# from serviceapp.serializers import 
+from userapp.models import QuoteModel, UserModel
 
 # Create your models here.
 class CompanyModel(models.Model):
@@ -37,7 +37,7 @@ class NotificationModel(models.Model): #create automatically when adding quote
     created_date =  models.DateTimeField(auto_now_add=True,null=True)
     updated_date = models.DateTimeField(auto_now=True,null=True)
 
-class AcceptedQuoteModel(models.Model): #added while partner accept the quote request
+class AcceptedQuoteModel(models.Model): #added while partner accept the quote and booking request
     partnerid = models.ForeignKey(PartnerServiceModel,on_delete=models.CASCADE,null=True)
     quote = models.ForeignKey(QuoteModel,on_delete=models.CASCADE,null=True)
     status = models.CharField(max_length=100)
@@ -45,9 +45,12 @@ class AcceptedQuoteModel(models.Model): #added while partner accept the quote re
     created_date =  models.DateTimeField(auto_now_add=True,null=True)
     updated_date = models.DateTimeField(auto_now=True,null=True)
 
-# class BookingAcceptModel(models.Model):
-#     partnerid = models.ForeignKey(PartnerServiceModel,on_delete=models.CASCADE,null=True)
-#     quote = models.ForeignKey(QuoteModel,on_delete=models.CASCADE,null=True)
-#     status = models.CharField(max_length=100)
-#     created_date =  models.DateTimeField(auto_now_add=True,null=True)
-#     updated_date = models.DateTimeField(auto_now=True,null=True)
+
+    
+class PaymentModel(models.Model): #secretkey:: bb2K8X1SMPpvS1keCbRKTz8I ,keyid ::rzp_test_mSeuLnKB76I9N8
+    quote = models.ForeignKey(AcceptedQuoteModel,on_delete=models.PROTECT)
+    paymentid = models.CharField(max_length=100)
+    is_paid = models.BooleanField(default=False)
+    description = models.TextField()
+    created_date =  models.DateTimeField(auto_now_add=True,null=True)
+    updated_date = models.DateTimeField(auto_now=True,null=True)
