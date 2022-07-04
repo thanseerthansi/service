@@ -22,6 +22,7 @@ class ServiceModel(models.Model):#admin add services and cities added while addi
     service_name = models.CharField(max_length=100)
     photo = models.ImageField(upload_to='Image',blank=True,null=True)
     city = models.ManyToManyField(ServiceCitiesModel)
+    popular = models.BooleanField(default=False)
     created_date =  models.DateTimeField(auto_now_add=True,null=True)
     updated_date = models.DateTimeField(auto_now=True,null=True)
 
