@@ -6,3 +6,4 @@ from serviceapp.models import *
 admin.site.register(ServiceTypeModel)
 admin.site.register(ServiceCitiesModel)
 admin.site.register(ServiceModel)
+admin.site.register(ServicelinkModel)

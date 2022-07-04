@@ -30,7 +30,8 @@ SECRET_KEY = ')p-ca#*3&=#-tz9yf#s7rx&totnf(tm=tcm(jg-t#5z681g%i8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+CORS_ORIGIN_ALLOW_ALL=True
 
 
 # Application definition
@@ -51,9 +52,11 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,7 +71,7 @@ ROOT_URLCONF = 'projectservice.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -148,3 +151,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 RAZOR_KEY_ID = 'rzp_test_mSeuLnKB76I9N8'   
 RAZOR_KEY_SECRET = 'bb2K8X1SMPpvS1keCbRKTz8I'
+
+# email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'gymmanagment720@gmail.com'
+EMAIL_HOST_PASSWORD = 'nxomztyqhnpmkhcc'
+EMAIL_PORT = 587

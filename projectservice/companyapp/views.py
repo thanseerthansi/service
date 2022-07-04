@@ -137,17 +137,19 @@ class PartnerServiceView(ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes =(IsAuthenticated,)
     def post(self,request):# give datasn as array
-        userid = self.request.user.id
+        
         id = self.request.POST.get("id",'')
         partner = self.request.POST.get("partner",'')
-        service = self.request.POST.get("service")
-        is_admin = self.request.user.is_admin
-        is_partner = self.request.user.is_partner
-        print("p",self.request.data)
+        service = self.request.POST.get("service",'')
+        
         try:
+            userid = self.request.user.id
+            is_admin = self.request.user.is_admin
+            is_partner = self.request.user.is_partner
+            print("p",self.request.data)
             if is_admin ==True or is_partner ==True:
-                print("partneer",partner)
-                print("partnre")
+                # print("partneer",partner)
+                # print("partnre")
                 partner_qs = UserModel.objects.filter(id=userid)
                 if partner_qs.count():partner_obj = partner_qs.first()
                 else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"User not found "})
@@ -181,8 +183,22 @@ class PartnerServiceView(ListAPIView):
                             else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Messsage":"Service not found "})
                             partner_service_obj = PartnerServiceSerializer(data=i,partial=True)
                             msg = "Created successfully"
+                            # print("self.is",i['city'])
                             partner_service_obj.is_valid(raise_exception=True)
                             partner_service_obj.save(partnerid=partner_obj,service=service_obj)
+                            city_list = list(ServiceCitiesModel.objects.all().values_list('city',flat=True))#list the city and if the city present pass otherways add this city to city model
+                            if i['city'] in city_list:
+                                print("okkkid")
+                                city_id = ServiceCitiesModel.objects.filter(city__icontains = i['city'])
+                                city_id=city_id[0]
+                                pass
+                            else:
+                                print("elseok")
+                                add_city = ServiceCitiesModel.objects.create(country=i['country'],city=i['city'])
+                                city_id = add_city.id
+                            print("cityid",city_id)
+                            print("service city",service_obj)
+                            service_obj.city.add(city_id)#city added to the specific service
                             return Response({"Status":status.HTTP_200_OK,"Message":msg})
                         else:return Response({"Status":status.status.HTTP_404_NOT_FOUND,"Messsage":"Service not found "})
             else: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Something went wrong"})
@@ -220,8 +236,26 @@ class PartnerServiceView(ListAPIView):
             if is_admin ==True or is_partner ==True:
             
                 qs = PartnerServiceModel.objects.filter(id=id)
+                
                 if qs.count():
+                    partner_service_city =qs[0].city
+                    partner_service =qs[0].service
+                    print("city",partner_service_city)
                     qs = qs.delete()
+                    service_list  = list(PartnerServiceModel.objects.filter(service=partner_service).values_list('city',flat=True))
+                    if partner_service_city in service_list:
+                        print("in city list",partner_service.service_name)
+                        
+                        pass
+                    else:
+                        print("city not in list")
+                        service_city_qs = ServiceCitiesModel.objects.filter(city=partner_service_city)
+                        service_city_qs = service_city_qs[0]
+                        # print("cityobj",service_city_qs)
+                        # print("cityobj",service_city_qs.id)
+                        service_table = ServiceModel.objects.filter(service_name=partner_service.service_name)
+                        # print("servicecity",service_table[0].service_name)
+                        service_table[0].city.remove(service_city_qs)
                     return Response({"Status":status.HTTP_200_OK,"Message":"deleted successfully"})
                 return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No record found"})
             else:return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Something went wrong"})
@@ -315,7 +349,11 @@ class AcceptedQuoteView(ListAPIView):
                 quote_qs = QuoteModel.objects.filter(id=quote)
                 if quote_qs.count():
                     quote_obj = quote_qs.first()
+                    # print("emial",quote_obj.userid.email)
+                    Email_address = quote_obj.userid.email
+                    name = quote_obj.userid.username
                 else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"quote not found"})
+           
             if  is_admin ==True:
                 partnerservice = self.request.POST.get('partnerservice','')
                 if partnerservice:
@@ -339,6 +377,21 @@ class AcceptedQuoteView(ListAPIView):
             else: 
                 accepted_obj = AcceptedQuoteSerializer(data=self.request.data,partial=True)
                 msg = "Created successfully"
+                try:
+                    msg_html = render_to_string('email2.html', {'email': Email_address, 'name': name})
+                    # print('email',msg_html)
+                    send_mail(
+                        'congratulation  -'+str(name),
+                        'thanks',
+                        'gymmanagment720@gmail.com',
+                        [Email_address],
+                        fail_silently=False,
+                        html_message = msg_html,
+                    )
+                    print("email success")
+                except:
+                    print("email failed")
+                    pass
             accepted_obj.is_valid(raise_exception=True)
             accepted_obj.save(partnerid=partnerservice_obj,quote=quote_obj)
             return Response({"Status":status.HTTP_200_OK,"Message":msg})

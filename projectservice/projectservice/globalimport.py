@@ -16,3 +16,5 @@ from serviceapp.models import *
 from serviceapp.serializers import *
 from companyapp.models import *
 from companyapp.serializers import *
+from django.core.mail import send_mail
+from django.template.loader import render_to_string

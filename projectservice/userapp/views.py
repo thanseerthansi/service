@@ -258,8 +258,25 @@ class QuoteView(ListAPIView):
                         # print("Notification_obj",notification_obj)
                         p=[]
                         for i in partner_service_qs:
-                            # print("I",i.partnerid)
+                            
+                            Email_address = i.partnerid.email
+                            name = i.partnerid.username
                             p.append(i.partnerid)
+                            try:
+                                msg_html = render_to_string('email2.html', {'email': Email_address, 'name': name})
+                                # print('email',msg_html)
+                                send_mail(
+                                    'congratulation  -'+str(name),
+                                    'thanks',
+                                    'gymmanagment720@gmail.com',
+                                    [Email_address],
+                                    fail_silently=False,
+                                    html_message = msg_html,
+                                )
+                                print("email success",i.partnerid.email)
+                            except:
+                                print("email failed",i.partnerid.email)
+                                pass
                         notification_obj.partnerid.add(*p)
                     else:
                         saved_data.delete()
