@@ -25,8 +25,8 @@ class ServiceModel(models.Model):#admin add services and cities added while addi
     created_date =  models.DateTimeField(auto_now_add=True,null=True)
     updated_date = models.DateTimeField(auto_now=True,null=True)
 
-class ServicelinkModel(models.Model):
-    service_type = models.ForeignKey(ServiceTypeModel,on_delete=models.CASCADE)
-    services = models.ManyToManyField(ServiceModel)
-    created_date =  models.DateTimeField(auto_now_add=True,null=True)
-    updated_date = models.DateTimeField(auto_now=True,null=True)
+# class ServicelinkModel(models.Model):
+#     service_type = models.ForeignKey(ServiceTypeModel,on_delete=models.CASCADE)
+#     services = models.ManyToManyField(ServiceModel)
+#     created_date =  models.DateTimeField(auto_now_add=True,null=True)
+#     updated_date = models.DateTimeField(auto_now=True,null=True)

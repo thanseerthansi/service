@@ -192,12 +192,12 @@ class ServiceVew(ListAPIView):
                         else: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":data})          
                     service_obj.is_valid(raise_exception=True)
                     saved_data = service_obj.save(service_type=service_type_obj)
-                    service_link_qs = ServicelinkModel.objects.filter(service_type=service_type_obj)
-                    if service_link_qs.count():#adding the data to service link table 
-                        service_link_qs[0].services.add(saved_data)
-                    else:
-                        servicelink_obj = ServicelinkModel.objects.create(service_type=service_type_obj)
-                        servicelink_obj.services.add(saved_data)
+                    # service_link_qs = ServicelinkModel.objects.filter(service_type=service_type_obj)
+                    # if service_link_qs.count():#adding the data to service link table 
+                    #     service_link_qs[0].services.add(saved_data)
+                    # else:
+                    #     servicelink_obj = ServicelinkModel.objects.create(service_type=service_type_obj)
+                    #     servicelink_obj.services.add(saved_data)
                     data_city = self.request.POST.get('city','')
                     if data_city :#to add  multiple city datas to many2many
                         k=[]
@@ -222,9 +222,10 @@ class ServiceVew(ListAPIView):
             city = self.request.GET.get('city','')
             qs = ServiceModel.objects.all()
             if service_type: qs = qs.filter(service_type__id = service_type)
-            if service_type_name: qs = qs.filter(service_type__service = service_type_name)
+            if service_type_name: qs = qs.filter(service_type__service__icontains = service_type_name)
             if city : qs = qs.filter(city=city)
             if id : qs = qs.filter(id=id)
+            print("qs",qs)
             return qs.order_by('-id')
         except :return None
  
@@ -303,47 +304,47 @@ class ServiceVew(ListAPIView):
             #     })
         # else:return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Need to login"})
 
-class SevicelinkView(ListAPIView):
-    serializer_class = ServicelinkSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes =(AllowAny,) 
-    def get_queryset(self):
-        try:
-            id = self.request.GET.get("id",'')
-            service_type = self.request.GET.get("service_type",'')
-            service_type_name = self.request.GET.get("servicetype_name",'')
-            service = self.request.GET.get('service','')
-            city = self.request.GET.get('city','')
-            qs = ServicelinkModel.objects.all()
-            if service_type: qs = qs.filter(service_type__id = service_type)
-            if service_type_name: qs = qs.filter(service_type__service = service_type_name)
-            if city : qs = qs.filter(services__city__in=city)
-            if service : qs = qs.filter(services__city__id = service)
-            if id : qs = qs.filter(id=id)
-            return qs.order_by('-id')
-        except :return None
+# class SevicelinkView(ListAPIView):
+#     serializer_class = ServicelinkSerializer
+#     authentication_classes = (TokenAuthentication,)
+#     permission_classes =(AllowAny,) 
+#     def get_queryset(self):
+#         try:
+#             id = self.request.GET.get("id",'')
+#             service_type = self.request.GET.get("service_type",'')
+#             service_type_name = self.request.GET.get("servicetype_name",'')
+#             service = self.request.GET.get('service','')
+#             city = self.request.GET.get('city','')
+#             qs = ServicelinkModel.objects.all()
+#             if service_type: qs = qs.filter(service_type__id = service_type)
+#             if service_type_name: qs = qs.filter(service_type__service = service_type_name)
+#             if city : qs = qs.filter(services__city__in=city)
+#             if service : qs = qs.filter(services__city__id = service)
+#             if id : qs = qs.filter(id=id)
+#             return qs.order_by('-id')
+#         except :return None
  
-    def delete(self,request):
-        if self.request.user.id != None : 
-            isadmin = self.request.user.is_admin
-            superuser = self.request.user.is_superuser
-            if isadmin == True or superuser == True :
-                try:
-                    id = self.request.data['id']
-                    # id = json.loads(id)
-                    objects = ServicelinkModel.objects.filter(id=id)
-                    if objects.count():
-                        objects.delete()
-                        return Response({"Status":status.HTTP_200_OK,"Message":"deleted successfully"})
-                    else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No records with given id" })
-                except Exception as e:
-                    return Response({
-                        "Status" : status.HTTP_400_BAD_REQUEST,
-                        "Message" : str(e),
-                    })
-            else:
-                return Response({
-                    "Status" : status.HTTP_400_BAD_REQUEST,
-                    "Message" : "Something Went Wrong"
-                })
-        else:return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Need to login"})
+#     def delete(self,request):
+#         if self.request.user.id != None : 
+#             isadmin = self.request.user.is_admin
+#             superuser = self.request.user.is_superuser
+#             if isadmin == True or superuser == True :
+#                 try:
+#                     id = self.request.data['id']
+#                     # id = json.loads(id)
+#                     objects = ServicelinkModel.objects.filter(id=id)
+#                     if objects.count():
+#                         objects.delete()
+#                         return Response({"Status":status.HTTP_200_OK,"Message":"deleted successfully"})
+#                     else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"No records with given id" })
+#                 except Exception as e:
+#                     return Response({
+#                         "Status" : status.HTTP_400_BAD_REQUEST,
+#                         "Message" : str(e),
+#                     })
+#             else:
+#                 return Response({
+#                     "Status" : status.HTTP_400_BAD_REQUEST,
+#                     "Message" : "Something Went Wrong"
+#                 })
+#         else:return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Need to login"})

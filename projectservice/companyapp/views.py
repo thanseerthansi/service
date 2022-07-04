@@ -146,17 +146,19 @@ class PartnerServiceView(ListAPIView):
             userid = self.request.user.id
             is_admin = self.request.user.is_admin
             is_partner = self.request.user.is_partner
-            print("p",self.request.data)
+            # print("p",self.request.data)
             if is_admin ==True or is_partner ==True:
                 # print("partneer",partner)
                 # print("partnre")
                 partner_qs = UserModel.objects.filter(id=userid)
                 if partner_qs.count():partner_obj = partner_qs.first()
                 else: return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"User not found "})
+                # print("befreif service")
                 if service:
                     service_qs = ServiceModel.objects.filter(id=service)
                     if service_qs.count():service_obj = service_qs.first()
                     else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Messsage":"Service not found "})
+              
                 if id:
                     if id.isdigit():
                         partner_service_qs = PartnerServiceModel.objects.filter(id=id)  
@@ -200,9 +202,14 @@ class PartnerServiceView(ListAPIView):
                             print("service city",service_obj)
                             service_obj.city.add(city_id)#city added to the specific service
                             return Response({"Status":status.HTTP_200_OK,"Message":msg})
-                        else:return Response({"Status":status.status.HTTP_404_NOT_FOUND,"Messsage":"Service not found "})
-            else: return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Something went wrong"})
+                        else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Messsage":"Service not found "})
+                    else:return Response({"Status":status.HTTP_404_NOT_FOUND,"Message":"provide some value"})
+            else:
+                print("onpp")
+                return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":"Something went wrong"})
+            print("eception")
         except Exception as e:
+            print("e",e)
             return Response({"Status":status.HTTP_400_BAD_REQUEST,"Message":str(e),})
     def get_queryset(self):
         try:

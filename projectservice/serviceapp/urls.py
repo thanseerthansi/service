@@ -5,6 +5,6 @@ urlpatterns = [
    path('servicetype/',ServiceTypeVew.as_view()),
    path('servicecity/',ServicecitiesVew.as_view()),
    path('service/',ServiceVew.as_view()),
-   path('servicesview/',SevicelinkView.as_view()),
+   # path('servicesview/',SevicelinkView.as_view()),
   
 ]
