@@ -18,7 +18,7 @@ class CompanyModel(models.Model):
     description = models.TextField(null=True)
     created_date =  models.DateTimeField(auto_now_add=True,null=True)
 
-class PartnerServiceModel(models.Model): #give datas as array many =true
+class PartnerServiceModel(models.Model): #give datas as array many =true(while adding service the city add to the city model and the city add to specific service table city fieid(m2m)and remove while delete.)
     partnerid = models.ForeignKey(UserModel,on_delete=models.CASCADE,null=True)
     company_name = models.CharField(max_length=100)
     service = models.ForeignKey(ServiceModel,on_delete=models.CASCADE)
